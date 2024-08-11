@@ -12,6 +12,10 @@ import {
   deleteDoc,
   getDoc,
 } from 'firebase/firestore';
+import { auth } from '@/firebase';
+import { onAuthStateChanged } from 'firebase/auth';
+import SignIn from '@/components/SignIn';
+import SignOutButton from '@/components/SignOutButton';
 
 const style = {
   position: 'absolute',
@@ -34,12 +38,16 @@ export default function Home() {
   const [open, setOpen] = useState(false);
   const [itemName, setItemName] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
+  const [user, setUser] = useState(null);
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
   const updateInventory = async () => {
-    const snapshot = query(collection(firestore, 'inventory'));
+    if (!user) return; // Ensure user is authenticated
+  
+    const userInventoryRef = collection(firestore, `users/${user.uid}/inventory`);
+    const snapshot = query(userInventoryRef);
     const docs = await getDocs(snapshot);
     const inventoryList = [];
     docs.forEach((doc) => {
@@ -49,10 +57,22 @@ export default function Home() {
     setInventory(inventoryList);
     setFilteredInventory(inventoryList);
   };
+  
+
 
   useEffect(() => {
-    updateInventory();
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+    });
+
+    return () => unsubscribe();
   }, []);
+
+
+  useEffect(() => {
+    if(user) {
+    updateInventory();}
+  }, [user]);
 
   useEffect(() => {
     const filteredList = inventory.filter(item => 
@@ -62,8 +82,9 @@ export default function Home() {
   }, [searchQuery, inventory]);
 
   const addItem = async (item) => {
-    if (item.trim() === '') return;
-    const docRef = doc(collection(firestore, 'inventory'), item.toLowerCase());
+    if (!user || item.trim() === '') return;
+  
+    const docRef = doc(collection(firestore, `users/${user.uid}/inventory`), item.toLowerCase());
     const docSnap = await getDoc(docRef);
     if (docSnap.exists()) {
       const { quantity } = docSnap.data();
@@ -73,9 +94,12 @@ export default function Home() {
     }
     await updateInventory();
   };
+  
 
   const removeItem = async (item) => {
-    const docRef = doc(collection(firestore, 'inventory'), item.toLowerCase());
+    if (!user) return;
+  
+    const docRef = doc(collection(firestore, `users/${user.uid}/inventory`), item.toLowerCase());
     const docSnap = await getDoc(docRef);
     if (docSnap.exists()) {
       const { quantity } = docSnap.data();
@@ -87,17 +111,29 @@ export default function Home() {
       await updateInventory();
     }
   };
+  
+   
+  if (!user) {
+    return <SignIn />;
+  }
 
   return (
     <Box
-      width="100vw"
-      height="100vh"
-      display="flex"
-      justifyContent="center"
-      flexDirection="column"
-      alignItems="center"
-      gap={2}
+    sx={{
+      width: '100vw',
+      height: '100vh',
+      display: 'flex',
+      justifyContent: 'center',
+      flexDirection: 'column',
+      alignItems: 'center',
+      backgroundColor: '#eceff1', 
+      gap: 2,
+    }}
     >
+
+    <SignOutButton/>
+
+
       <Modal
         open={open}
         onClose={handleClose}
