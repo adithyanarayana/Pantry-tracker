@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Box, Stack, Typography, Button, Modal, TextField } from '@mui/material';
 import { firestore } from '@/firebase';
 import {
@@ -43,7 +43,7 @@ export default function Home() {
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
-  const updateInventory = async () => {
+  const updateInventory = useCallback(async () => {
     if (!user) return; // Ensure user is authenticated
   
     const userInventoryRef = collection(firestore, `users/${user.uid}/inventory`);
@@ -56,7 +56,7 @@ export default function Home() {
     });
     setInventory(inventoryList);
     setFilteredInventory(inventoryList);
-  };
+  }, [user, firestore] );
   
 
 

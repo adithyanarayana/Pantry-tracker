@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '@/firebase';
 import { TextField, Button, Box, Typography, Stack } from '@mui/material';
-import SignUp from "@/components/SignUp";
+//import SignUp from "@/components/SignUp";
 
 export default function SignIn() {
   const [email, setEmail] = useState('');
@@ -77,7 +77,7 @@ export default function SignIn() {
                 Sign In
               </Button>
               <Typography variant="body2">
-                Don't have an account?{' '}
+              Don&apos;t have an account?{' '}
                 <Button variant="text" onClick={() => setShowSignUp(true)}>
                   Sign Up
                 </Button>
