@@ -56,7 +56,7 @@ export default function Home() {
     });
     setInventory(inventoryList);
     setFilteredInventory(inventoryList);
-  }, [user, firestore] );
+  }, [user] );
   
 
 

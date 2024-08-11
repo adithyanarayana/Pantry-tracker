@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '@/firebase';
 import { TextField, Button, Box, Typography, Stack } from '@mui/material';
-//import SignUp from "@/components/SignUp";
+import SignUp from "/components/SignUp";
 
 export default function SignIn() {
   const [email, setEmail] = useState('');
