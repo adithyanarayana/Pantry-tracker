@@ -72,7 +72,7 @@ export default function Home() {
   useEffect(() => {
     if(user) {
     updateInventory();}
-  }, [user]);
+  }, [user, updateInventory]);
 
   useEffect(() => {
     const filteredList = inventory.filter(item => 
